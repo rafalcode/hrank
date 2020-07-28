@@ -8,12 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// macro to swap two intergers
-#define swapi((a),(b),(tmp)); \
-    (tmp)=(a); \
-    (a)=(b); \
-    (b)=(tmp);
-
 /* fn prototypes */
 char* readline();
 char** split_string(char*);
@@ -21,13 +15,15 @@ char** split_string(char*);
 // Complete the countInversions function below.
 long countInversions(int arrsz, int* arr)
 {
+    int tmp;
     int i, j=0;
     int coumis=0; // count missplacings.
 
     for(i=1;i<arrsz;++i) 
-        if(arr[j]>arr[i])i { 
+        if(arr[j]>arr[i]) { 
             coumis++;
-            swapi(arr[j], arr[i]);
+            tmp=arr[j]; arr[j]=arr[i], arr[i]=tmp; //swap!
+            j++;
         }
 
     return coumis;
@@ -41,6 +37,7 @@ int main()
         printf("Environment variable $OUTPUT_PATH not defined. Default will be %s.\n", retenv);
     }
     FILE* fptr = fopen(retenv, "w");
+    int i;
 
     char* t_endptr;
     char* t_str = readline();
@@ -65,7 +62,7 @@ int main()
 
         int* arr = malloc(n * sizeof(int));
 
-        for (int i = 0; i < n; i++) {
+        for (i = 0; i < n; i++) {
             char* arr_item_endptr;
             char* arr_item_str = *(arr_temp + i);
             int arr_item = strtol(arr_item_str, &arr_item_endptr, 10);
@@ -79,7 +76,10 @@ int main()
         long result = countInversions(n,  arr);
 
         fprintf(fptr, "%ld\n", result);
-        printf("Subproblem %i sent to output at %s.\n", subprobnum, retenv);
+        fprintf(fptr, "Array: ");
+        for(i=0;i<n;++i) 
+            fprintf(fptr, "%i ", arr[i]);
+        printf("Subproblem %i sent to output at %s.\n", 1+subprobnum, retenv);
         free(arr);
         free(arr_temp);
         free(gs);
