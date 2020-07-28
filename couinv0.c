@@ -1,3 +1,4 @@
+/* hackerrank input is awkward, it by default wants inerteactive input by the user, though the idea is the user should be able to copy paste input too or direct input too */
 #include <assert.h>
 #include <limits.h>
 #include <math.h>
@@ -8,86 +9,64 @@
 #include <stdlib.h>
 #include <string.h>
 
-// macro to swap two intergers
-#define swapi((a),(b),(tmp)); \
-    (tmp)=(a); \
-    (a)=(b); \
-    (b)=(tmp);
-
 /* fn prototypes */
 char* readline();
 char** split_string(char*);
 
-// Complete the countInversions function below.
-long countInversions(int arrsz, int* arr)
-{
-    int i, j=0;
-    int coumis=0; // count missplacings.
-
-    for(i=1;i<arrsz;++i) 
-        if(arr[j]>arr[i])i { 
-            coumis++;
-            swapi(arr[j], arr[i]);
-        }
-
-    return coumis;
-}
-
 int main()
 {
-    char *retenv=getenv("OUTPUT_PATH");
+    char *retenv=getenv("HR_OUTPUT_PATH");
     if(!retenv) {
+        printf("Environment variable $HR_OUTPUT_PATH not defined.");
         retenv="./hr_output_file.txt";
-        printf("Environment variable $OUTPUT_PATH not defined. Default will be %s.\n", retenv);
     }
+    printf("Output will be sent to = %s\n", retenv); 
     FILE* fptr = fopen(retenv, "w");
 
+    /* the very first readline() takes place before the main loop (subsequently, it gets called during each loop iteration
+     * because this sole number will tell us how many subproblems there are. The subproblems will be held inside the loop */
     char* t_endptr;
     char* t_str = readline();
-    int t = strtol(t_str, &t_endptr, 10);
+    int t = strtol(t_str, &t_endptr, 10); // convert to long int. I usually use atoi(), but strtol() is more general .. can capture substrings, and use base 16 for hex: here base is 10.
+    printf("First input stirng element defines %i subproblems.\n", t); 
 
-    if (t_endptr == t_str || *t_endptr != '\0') { exit(EXIT_FAILURE); }
-    free(t_str);
+    if(t_endptr == t_str || *t_endptr != '\0') {
+        printf("Error. First strtol() call was ineffective.\n"); 
+        exit(EXIT_FAILURE);
+    }
 
-    int subprobnum=0;
     for (int t_itr = 0; t_itr < t; t_itr++) {
+        /* inside the loop, we expect to read the size of each subproblem, followed by the array input for each subproblem */
         char* n_endptr;
         char* n_str = readline();
         int n = strtol(n_str, &n_endptr, 10);
         // printf("%i\n", n); 
 
-        if (n_endptr == n_str || *n_endptr != '\0') { exit(EXIT_FAILURE); }
-        free(n_str);
+        if (n_endptr == n_str || *n_endptr != '\0') {
+            printf("Error. subproblem size strtol() call was ineffective.\n"); 
+            exit(EXIT_FAILURE);
+        }
 
+        // the next line will be an array and there is an inner loop for that.
         char *gs=readline();
         // printf("%s\n", gs);
         char** arr_temp = split_string(gs);
-
         int* arr = malloc(n * sizeof(int));
-
         for (int i = 0; i < n; i++) {
             char* arr_item_endptr;
             char* arr_item_str = *(arr_temp + i);
             int arr_item = strtol(arr_item_str, &arr_item_endptr, 10);
             printf("%i\n", arr_item); 
 
-            if (arr_item_endptr == arr_item_str || *arr_item_endptr != '\0') { exit(EXIT_FAILURE); }
-
+            if (arr_item_endptr == arr_item_str || *arr_item_endptr != '\0') {
+                printf("Error. arr_item strtol() call was ineffective.\n"); 
+                exit(EXIT_FAILURE);
+            }
             *(arr + i) = arr_item;
         }
-
-        long result = countInversions(n,  arr);
-
-        fprintf(fptr, "%ld\n", result);
-        printf("Subproblem %i sent to output at %s.\n", subprobnum, retenv);
-        free(arr);
-        free(arr_temp);
-        free(gs);
-        subprobnum++;
     }
 
     fclose(fptr);
-
     return 0;
 }
 
